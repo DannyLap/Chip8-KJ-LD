@@ -1,8 +1,11 @@
 package Stucts
 
 type CPU struct {
-	Register       string //
-	IndexRegister  string
-	ProgramCounter string // (PC)
-	Memory         string
+	Registers []byte
+	PC        byte
+	I         byte
+	SP        byte
+	DT        byte
+	ST        byte
+	Memory    []byte
 }
