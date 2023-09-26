@@ -7,5 +7,11 @@ type CPU struct {
 	SP        byte
 	DT        byte
 	ST        byte
-	Memory    []byte
+	Memory    [4096]byte
+}
+
+func (c *CPU) AddROMToMemory(data []byte) {
+	for i, b := range data {
+		c.Memory[0x200+i] = b
+	}
 }

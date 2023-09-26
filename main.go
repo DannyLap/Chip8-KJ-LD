@@ -9,6 +9,9 @@ import (
 
 func main() {
 	cpu := new(structs.CPU)
+	var memory [4096]byte
+	cpu.Memory = memory
+
 	file := os.Args[1]
 	// Lit le contenu du fichier en mémoire
 	data, err := ioutil.ReadFile(file)
@@ -16,7 +19,7 @@ func main() {
 		fmt.Println("Erreur de lecture du fichier :", err)
 		return
 	}
-	cpu.Memory = data
+	cpu.AddROMToMemory(data)
 
-	structs.OpenWindowEbiten()
+	structs.OpenWindowEbiten() // remettre dans le main
 }
