@@ -19,7 +19,8 @@ func main() {
 		fmt.Println("Erreur de lecture du fichier :", err)
 		return
 	}
-	cpu.AddROMToMemory(data)
-
+	cpu.InitMemory(data)
+	cpu.AddOpcodesToCPU()
+	fmt.Println(cpu.Opcodes[0] * cpu.Opcodes[1])
 	structs.OpenWindowEbiten() // remettre dans le main
 }
