@@ -15,7 +15,7 @@ func (c *CPU) AddOpcodesToCPU() {
 	}
 }
 
-func (c *CPU) OpcodesReading(data [2]byte) { //il faudra utiliser les opcodes par la suite
+func (c *CPU) OpcodesReading(data [2]byte) {
 	opcode := uint16(data[0])<<8 | uint16(data[1])
 	switch opcode & 0xF000 {
 	case 0x0000:
@@ -31,39 +31,39 @@ func (c *CPU) OpcodesReading(data [2]byte) { //il faudra utiliser les opcodes pa
 		//Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
 		//z'ai po compris ça
 	case 0x3000:
-		vX := opcode & 0x0F00
+		x := opcode & 0x0F00
 		kk := byte(opcode & 0x00FF)
-		if c.Registers[vX] == kk {
+		if c.Registers[x] == kk {
 			c.PC += 2
 		}
 	case 0x4000:
-		vX := opcode & 0x0F00
+		x := opcode & 0x0F00
 		kk := byte(opcode & 0x00FF)
-		if c.Registers[vX] == kk {
+		if c.Registers[x] == kk {
 			c.PC += 2
 		}
 	case 0x5000:
-		vX := opcode & 0x0F00
-		vY := opcode & 0x00F0
-		if c.Registers[vX] == c.Registers[vY] {
+		x := opcode & 0x0F00
+		y := opcode & 0x00F0
+		if c.Registers[x] == c.Registers[y] {
 			c.PC += 2
 		}
 	case 0x6000:
-		vX := opcode & 0x0F00
+		x := opcode & 0x0F00
 		kk := byte(opcode & 0x00FF)
-		c.Registers[vX] = kk
+		c.Registers[x] = kk
 		// Set Vx = kk. The interpreter puts the value kk into register Vx.
 	case 0x7000:
-		vX := opcode & 0x0F00
+		x := opcode & 0x0F00
 		kk := byte(opcode & 0x00FF)
-		c.Registers[vX] = kk
+		c.Registers[x] = kk
 		//Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in Vx.
 	case 0x8000:
 		switch opcode & 0xF00F {
 		case 0x8000:
-			vX := opcode & 0x0F00
-			vY := opcode & 0x00F0
-			c.Registers[vX] = c.Registers[vY]
+			x := opcode & 0x0F00
+			y := opcode & 0x00F0
+			c.Registers[x] = c.Registers[y]
 			//Set Vx = Vy. Stores the value of register Vy in register Vx
 		case 0x8001:
 			//Set Vx = Vx OR Vy. Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A
@@ -117,6 +117,8 @@ func (c *CPU) OpcodesReading(data [2]byte) { //il faudra utiliser les opcodes pa
 	case 0xE000:
 		switch opcode & 0xF0FF {
 		case 0xE09E:
+			//x := opcode & 0x0F00
+			c.PC += 2
 			//Skip next instruction if key with the value of Vx is pressed. Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
 		case 0xE0A1:
 			//Skip next instruction if key with the value of Vx is not pressed. Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2
