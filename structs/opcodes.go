@@ -26,15 +26,23 @@ func (c *CPU) OpcodesReading(data [2]byte) {
 	case 0x0000:
 		switch opcode {
 		case 0x00E0:
+			c.ClearScreen()
+			// Clear the display
 		case 0x00EE:
+			c.PC = c.Stack[c.SP]
+			c.SP--
+			// Return from a subroutine.The interpreter sets the program counter to the address at the top of the stack,
+			// then subtracts 1 from the stack pointer
 		}
 	case 0x1000:
 		nn := byte(opcode & 0x0FFF)
 		c.PC = nn
 	case 0x2000:
-		//nnn := opcode & 0x0FFF
+		nnn := byte(opcode & 0x0FFF)
+		c.SP++
+		c.Stack[c.SP] = c.PC
+		c.PC = nnn
 		//Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
-		//z'ai po compris ça
 	case 0x3000:
 		x := opcode & 0x0F00
 		kk := byte(opcode & 0x00FF)
@@ -187,16 +195,26 @@ func (c *CPU) OpcodesReading(data [2]byte) {
 	case 0xF000:
 		switch opcode & 0xF0FF {
 		case 0xF007:
+			x := opcode & 0x0F00
+			c.Registers[x] = c.DT
 			//Set Vx = delay timer value. The value of DT is placed into Vx.
 		case 0xF00A:
 			//Wait for a key press, store the value of the key in Vx. All execution stops until a key is pressed, then the value of that key is stored in Vx.
 		case 0xF015:
+			x := opcode & 0x0F00
+			c.DT = c.Registers[x]
 			//Set delay timer = Vx. Delay Timer is set equal to the value of Vx.
 		case 0xF018:
+			x := opcode & 0x0F00
+			c.ST = c.Registers[x]
 			//Set sound timer = Vx. Sound Timer is set equal to the value of Vx
 		case 0xF01E:
+			x := opcode & 0x0F00
+			c.I += c.Registers[x]
 			//Set I = I + Vx. The values of I and Vx are added, and the results are stored in I.
 		case 0xF029:
+			x := opcode & 0x0F00
+			c.I = c.Registers[x] * 5 // + 0x200 ?
 			//Set I = location of sprite for digit Vx. The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal font. To obtain this value, multiply VX by 5 (all font data stored in first 80 bytes of memory)
 		case 0xF033:
 			//Store BCD representation of Vx in memory locations I, I+1, and I+2. The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.
