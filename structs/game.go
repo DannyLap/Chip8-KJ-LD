@@ -7,15 +7,26 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type Game struct {
-	Screen [64][32]byte
-}
+// type Game struct {
+// 	Registers []byte
+// 	PC        uint16
+// 	I         uint16
+// 	SP        uint16
+// 	DT        uint16
+// 	ST        uint16
+// 	Memory    [4096]byte
+// 	Stack     [16]uint16
+// 	Opcodes   []byte
+// 	Screen    [64][32]int
+// }
 
-func (g *Game) Update() error {
+func (c *CPU) Update() error {
+	c.OpcodesReading()
+	c.PC += 2
 	return nil
 }
 
-func (g *Game) Draw(screen *ebiten.Image) {
+func (c *CPU) Draw(screen *ebiten.Image) {
 	purpleCol := color.RGBA{255, 0, 255, 255}
 	whiteCol := color.RGBA{255, 255, 255, 255}
 	//blackCol := color.RGBA{0, 0, 0, 255}
@@ -23,20 +34,20 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	//blueCol := color.RGBA{0, 0, 255, 255}
 	//greenCol := color.RGBA{0, 255, 0, 255}
 
-	for i := 0; i < len(g.Screen); i++ {
-		for j := 0; j < len(g.Screen[i]); j++ {
-			if i == j {
-				g.Screen[i][j] = 1
-			}
-		}
-	}
-	for i := len(g.Screen) - 1; i > 0; i-- {
-		for j := len(g.Screen[i]) - 1; j > 0; j-- {
-			if i == j {
-				g.Screen[i][j] = 1
-			}
-		}
-	}
+	// for i := 0; i < len(g.Screen); i++ {
+	// 	for j := 0; j < len(g.Screen[i]); j++ {
+	// 		if i == j {
+	// 			g.Screen[i][j] = 1
+	// 		}
+	// 	}
+	// }
+	// for i := len(g.Screen) - 1; i > 0; i-- {
+	// 	for j := len(g.Screen[i]) - 1; j > 0; j-- {
+	// 		if i == j {
+	// 			g.Screen[i][j] = 1
+	// 		}
+	// 	}
+	// }
 
 	//g.Screen[63][31] = 1
 	//g.Screen[63][0] = 1
@@ -47,9 +58,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	//DrawASquare(0*5, 31*5, screen, 5, greenCol)
 	//DrawASquare(0*5, 0*5, screen, 5, purpleCol)
 
-	for i := 0; i < len(g.Screen); i++ {
-		for j := 0; j < len(g.Screen[i]); j++ {
-			if g.Screen[i][j] == 1 {
+	for i := 0; i < len(c.Screen); i++ {
+		for j := 0; j < len(c.Screen[i]); j++ {
+			if c.Screen[i][j] == 1 {
 				DrawASquare(i*5, j*5, screen, 5, whiteCol)
 			} else {
 				DrawASquare(i*5, j*5, screen, 5, purpleCol)
@@ -66,14 +77,14 @@ func DrawASquare(x int, y int, screen *ebiten.Image, size int, color color.RGBA)
 	}
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+func (c *CPU) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 320, 240
 }
 
-func OpenWindowEbiten() {
+func OpenWindowEbiten(cpu *CPU) {
 	ebiten.SetWindowSize(1000, 900)
 	ebiten.SetWindowTitle("Chip 8")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(cpu); err != nil {
 		log.Fatal(err)
 	}
 }

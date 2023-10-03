@@ -1,39 +1,40 @@
 package structs
 
 type CPU struct {
-	Registers []byte
-	PC        byte
-	I         byte
-	SP        byte
-	DT        byte
-	ST        byte
+	Registers [16]byte
+	PC        uint16
+	I         uint16
+	SP        uint16
+	DT        uint16
+	ST        uint16
 	Memory    [4096]byte
-	Stack     [32]byte
+	Stack     [16]uint16
 	Opcodes   []byte
-	Screen    [32][64]int
+	Screen    [64][32]byte
 }
 
-func (c *CPU) InitCPU(data []byte) {
-	c.InitMemory(data)
-	c.AddOpcodesToCPU()
+func (g *CPU) InitCPU(data []byte) {
+	g.PC = 0x200
+	g.InitMemory(data)
+	g.AddOpcodesToCPU()
 }
 
-func (c *CPU) InitMemory(data []byte) {
-	c.AddROMToMemory(data)
-	c.AddFontSetToMemory()
+func (g *CPU) InitMemory(data []byte) {
+	g.AddROMToMemory(data)
+	g.AddFontSetToMemory()
 }
 
-func (c *CPU) ClearScreen() {
-	c.Screen = [32][64]int{}
+func (g *CPU) ClearScreen() {
+	g.Screen = [64][32]byte{}
 }
 
-func (c *CPU) AddROMToMemory(data []byte) {
+func (g *CPU) AddROMToMemory(data []byte) {
 	for i, b := range data {
-		c.Memory[0x200+i] = b
+		g.Memory[0x200+i] = b
 	}
 }
 
-func (c *CPU) AddFontSetToMemory() {
+func (g *CPU) AddFontSetToMemory() {
 	fontset := []byte{
 		0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 		0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -58,6 +59,6 @@ func (c *CPU) AddFontSetToMemory() {
 		0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 		0xF0, 0x80, 0xF0, 0x80, 0x0} // F
 	for i, b := range fontset {
-		c.Memory[i] = b
+		g.Memory[i] = b
 	}
 }
