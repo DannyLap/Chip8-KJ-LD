@@ -20,7 +20,6 @@ func main() {
 		return
 	}
 	cpu.InitCPU(data)
-	fmt.Println(cpu.Memory[590], cpu.Memory[591])
-
+	fmt.Println(cpu.Memory)
 	structs.OpenWindowEbiten(cpu) // remettre dans le main
 }

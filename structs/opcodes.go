@@ -23,7 +23,7 @@ func (c *CPU) AddOpcodesToCPU() {
 
 func (c *CPU) OpcodesReading() {
 	opcode := uint16(c.Memory[c.PC])<<8 | uint16(c.Memory[c.PC+1])
-	fmt.Println(c.Memory[c.PC], c.Memory[c.PC+1])
+	fmt.Println(c.PC, c.Memory[c.PC], c.Memory[c.PC+1])
 	switch opcode & 0xF000 {
 	case 0x0000:
 		switch opcode {
@@ -38,7 +38,7 @@ func (c *CPU) OpcodesReading() {
 		}
 	case 0x1000:
 		nnn := opcode & 0x0FFF
-		// fmt.Println(nnn)
+		//fmt.Println(nnn)
 		c.PC = nnn
 	case 0x2000:
 		nnn := opcode & 0x0FFF
@@ -66,7 +66,6 @@ func (c *CPU) OpcodesReading() {
 		}
 	case 0x6000:
 		x := (opcode & 0x0F00) / 256
-		// fmt.Println(x)
 		kk := byte(opcode & 0x00FF)
 		c.Registers[x] = kk
 		// Set Vx = kk. The interpreter puts the value kk into register Vx.
@@ -185,7 +184,7 @@ func (c *CPU) OpcodesReading() {
 		y := (opcode & 0x00F0) / 16
 		n := byte(opcode & 0x000F)
 		collision := false
-
+		fmt.Println(c.Memory[c.I : c.I+uint16(n)])
 		for k := byte(0); k < n; k++ {
 			spriteByte := c.Memory[c.I+uint16(k)] // Lire l'octet du sprite depuis la mémoire à l'emplacement I
 
