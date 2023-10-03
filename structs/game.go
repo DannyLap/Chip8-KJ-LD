@@ -8,7 +8,7 @@ import (
 )
 
 type Game struct {
-	ScreenT [32][64]byte
+	Screen [64][32]byte
 }
 
 func (g *Game) Update() error {
@@ -17,22 +17,53 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	purpleCol := color.RGBA{255, 0, 255, 255}
-	for i := 0; i < len(g.ScreenT); i++ {
-		for j := 0; j < len(g.ScreenT[i]); j++ {
+	whiteCol := color.RGBA{255, 255, 255, 255}
+	//blackCol := color.RGBA{0, 0, 0, 255}
+	//redCol := color.RGBA{255, 0, 0, 255}
+	//blueCol := color.RGBA{0, 0, 255, 255}
+	//greenCol := color.RGBA{0, 255, 0, 255}
+
+	for i := 0; i < len(g.Screen); i++ {
+		for j := 0; j < len(g.Screen[i]); j++ {
 			if i == j {
-				g.ScreenT[i][j] = 1
+				g.Screen[i][j] = 1
+			}
+		}
+	}
+	for i := len(g.Screen) - 1; i > 0; i-- {
+		for j := len(g.Screen[i]) - 1; j > 0; j-- {
+			if i == j {
+				g.Screen[i][j] = 1
 			}
 		}
 	}
 
-	for i := 0; i < len(g.ScreenT); i++ {
-		for j := 0; j < len(g.ScreenT[i]); j++ {
-			if g.ScreenT[i][j] == 1 {
-				screen.Set(i*10, j*10, purpleCol)
+	//g.Screen[63][31] = 1
+	//g.Screen[63][0] = 1
+	//g.Screen[0][31] = 1
+	//g.Screen[0][0] = 1
+	//DrawASquare(63*5, 31*5, screen, 5, redCol)
+	//DrawASquare(63*5, 0*5, screen, 5, blueCol)
+	//DrawASquare(0*5, 31*5, screen, 5, greenCol)
+	//DrawASquare(0*5, 0*5, screen, 5, purpleCol)
+
+	for i := 0; i < len(g.Screen); i++ {
+		for j := 0; j < len(g.Screen[i]); j++ {
+			if g.Screen[i][j] == 1 {
+				DrawASquare(i*5, j*5, screen, 5, whiteCol)
+			} else {
+				DrawASquare(i*5, j*5, screen, 5, purpleCol)
 			}
 		}
 	}
-	//ebitenutil.DebugPrint(screen, "Hello, World!")
+}
+
+func DrawASquare(x int, y int, screen *ebiten.Image, size int, color color.RGBA) {
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
+			screen.Set(x+i, y+j, color)
+		}
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -40,18 +71,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func OpenWindowEbiten() {
-	//var screen [32][64]byte
-	//for i := 0; i < len(screen); i++ {
-	//	for j := 0; j < len(screen[i]); j++ {
-	//		if i == j {
-	//			screen[i][j] = 1
-	//		}
-	//	}
-	//	//fmt.Print(i)
-	//	//fmt.Println(screen[i])
-	//}
-
-	ebiten.SetWindowSize(640, 320)
+	ebiten.SetWindowSize(1000, 900)
 	ebiten.SetWindowTitle("Chip 8")
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
