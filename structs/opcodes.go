@@ -1,5 +1,10 @@
 package structs
 
+import (
+	"math/rand"
+	"time"
+)
+
 func (c *CPU) AddOpcodesToCPU() {
 	c.Opcodes = []byte{
 		0x00, 0xE0, 0x00, 0xEE, 0x00, 0xC0, 0x00, 0xFB,
@@ -56,7 +61,7 @@ func (c *CPU) OpcodesReading(data [2]byte) {
 	case 0x7000:
 		x := opcode & 0x0F00
 		kk := byte(opcode & 0x00FF)
-		c.Registers[x] = kk
+		c.Registers[x] += kk
 		//Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in Vx.
 	case 0x8000:
 		switch opcode & 0xF00F {
@@ -66,37 +71,88 @@ func (c *CPU) OpcodesReading(data [2]byte) {
 			c.Registers[x] = c.Registers[y]
 			//Set Vx = Vy. Stores the value of register Vy in register Vx
 		case 0x8001:
+			x := opcode & 0x0F00
+			y := opcode & 0x00F0
+			c.Registers[x] = c.Registers[x] | c.Registers[y]
 			//Set Vx = Vx OR Vy. Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A
 			// bitwise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the
 			// result is also 1. Otherwise, it is 0.
-			//trop compliqué pour le moment
 		case 0x8002:
+			x := opcode & 0x0F00
+			y := opcode & 0x00F0
+			c.Registers[x] = c.Registers[x] & c.Registers[y]
 			// Set Vx = Vx AND Vy. Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx.
 			// A bitwise AND compares the corresponding bits from two values, and if both bits are 1, then the same bit
 			// in the result is also 1. Otherwise, it is 0.
 			//trop compliqué pour le moment
 		case 0x8003:
+			x := opcode & 0x0F00
+			y := opcode & 0x00F0
+			c.Registers[x] = c.Registers[x] ^ c.Registers[y]
 			// Set Vx = Vx XOR Vy. Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result
 			// in Vx. An exclusive OR compares the corresponding bits from two values, and if the bits are not both the
 			// same, then the corresponding bit in the result is set to 1. Otherwise, it is 0
 		case 0x8004:
+			x := opcode & 0x0F00
+			y := opcode & 0x00F0
+			c.Registers[x] += c.Registers[y]
+			if c.Registers[x] > 255 {
+				c.Registers[0xF] = 1
+			} else {
+				c.Registers[0xF] = 0
+			}
 			//Set Vx = Vx + Vy, set VF = carry. The values of Vx and Vy are added together. If the result is greater
 			// than 8 bits (i.e., ¿ 255,) VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored
 			// in Vx
 		case 0x8005:
+			x := opcode & 0x0F00
+			y := opcode & 0x00F0
+
+			if c.Registers[x] >= c.Registers[y] {
+				c.Registers[0xF] = 1
+				c.Registers[x] -= c.Registers[y]
+			} else {
+				c.Registers[0xF] = 0
+			}
 			// Set Vx = Vx - Vy, set VF = NOT borrow. If Vx ¿ Vy, then VF is set to 1, otherwise 0. Then Vy is
 			// subtracted from Vx, and the results stored in Vx
 		case 0x8006:
+			x := opcode & 0x0F00
+			if c.Registers[x]&1 == 1 {
+				c.Registers[0xF] = 1
+			} else {
+				c.Registers[0xF] = 0
+			}
+			c.Registers[x] >>= 1
 			// Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 			// divided by 2
 		case 0x8007:
+			x := opcode & 0x0F00
+			y := opcode & 0x00F0
+			if c.Registers[y] >= c.Registers[x] {
+				c.Registers[0xF] = 1
+				c.Registers[y] -= c.Registers[x]
+			} else {
+				c.Registers[0xF] = 0
+			}
 			// 	Set Vx = Vy - Vx, set VF = NOT borrow. If Vy ¿ Vx, then VF is set to 1, otherwise 0. Then Vx is
 			// subtracted from Vy, and the results stored in Vx.
 		case 0x800E:
+			x := opcode & 0x0F00
+			if c.Registers[x]&0x80 == 0x80 {
+				c.Registers[0xF] = 0
+			}
+			c.Registers[x] <<= 1
 			// Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is
 			// multiplied by 2.
-
 		}
+	case 0x9000:
+		x := opcode & 0x0F00
+		y := opcode & 0x00F0
+		if c.Registers[x] == c.Registers[y] {
+			c.PC += 2
+		}
+		//Skip next instruction if Vx != Vy. The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
 	case 0xA000:
 		nnn := byte(opcode & 0x0FFF)
 		c.Registers[nnn] = c.Registers[c.I]
@@ -107,6 +163,11 @@ func (c *CPU) OpcodesReading(data [2]byte) {
 		c.PC = nnn + c.Registers[0]
 		// Jump to location nnn + V0. The program counter is set to nnn plus the value of V0
 	case 0xC000:
+		rand.Seed(time.Now().UnixNano())
+		x := opcode & 0x0F00
+		kk := byte(opcode & 0x00FF)
+		rdByte := byte(rand.Intn(256))
+		c.Registers[x] = rdByte & kk
 		//Set Vx = random byte AND kk. The interpreter generates a random number from 0 to 255, which is then ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND.
 	case 0xD000:
 		// Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision. The interpreter reads n
