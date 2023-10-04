@@ -1,5 +1,7 @@
 package structs
 
+import "strings"
+
 type CPU struct {
 	Registers [16]byte
 	PC        uint16
@@ -60,5 +62,45 @@ func (g *CPU) AddFontSetToMemory() {
 		0xF0, 0x80, 0xF0, 0x80, 0x0} // F
 	for i, b := range fontset {
 		g.Memory[i] = b
+	}
+}
+
+func StringToHexa(s string) int16 {
+	s = strings.ToUpper(s)
+	switch s[0] {
+	case '0':
+		return 0x0
+	case '1':
+		return 0x1
+	case '2':
+		return 0x2
+	case '3':
+		return 0x3
+	case '4':
+		return 0x4
+	case '5':
+		return 0x5
+	case '6':
+		return 0x6
+	case '7':
+		return 0x7
+	case '8':
+		return 0x8
+	case '9':
+		return 0x9
+	case 'A':
+		return 0xA
+	case 'B':
+		return 0xB
+	case 'C':
+		return 0xC
+	case 'D':
+		return 0xD
+	case 'E':
+		return 0xE
+	case 'F':
+		return 0xF
+	default:
+		return 999
 	}
 }

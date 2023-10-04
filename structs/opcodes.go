@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"devt.de/krotik/common/termutil/getch"
 	"fmt"
 	"math/rand"
 	"time"
@@ -221,10 +222,34 @@ func (c *CPU) OpcodesReading() {
 	case 0xE000:
 		switch opcode & 0xF0FF {
 		case 0xE09E:
-			//x := opcode & 0x0F00
-			c.PC += 2
-			//Skip next instruction if key with the value of Vx is pressed. Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
+			// todo
+			//  Skip next instruction if key with the value of Vx is pressed. Checks the keyboard,
+			//  and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
+			var KeyPress *getch.KeyEvent
+			x := int16((opcode & 0x0F00) / 256)
+			// je sais pas a quoi ce sert mais ca doit etre utile
+			if err := getch.Start(); err != nil {
+				fmt.Println(err)
+				return
+			}
+			defer getch.Stop()
+
+			KeyPress, _ = getch.Getch()
+			fmt.Println("Key string = ", KeyPress.String())
+			key := StringToHexa(KeyPress.String())
+			fmt.Println("Key = ", key)
+			fmt.Println("x = ", x)
+			switch key {
+			case x:
+				fmt.Println("vaulacvkabrcabmilabcralvaucvacablcua")
+				c.PC += 2
+
+			default:
+				fmt.Println("11111111111111111111111111111111111111111111111")
+				c.PC += 1
+			}
 		case 0xE0A1:
+			// todo
 			//Skip next instruction if key with the value of Vx is not pressed. Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2
 		}
 	case 0xF000:

@@ -20,9 +20,25 @@ import (
 // 	Screen    [64][32]int
 // }
 
+var (
+	keyStates = make(map[ebiten.Key]bool)
+)
+
 func (c *CPU) Update() error {
 	c.OpcodesReading()
 	return nil
+
+	//if ebiten.IsKeyPressed(ebiten.KeyA) {
+	//	keyStates[ebiten.KeyA] = true
+	//} else {
+	//	keyStates[ebiten.KeyA] = false
+	//}
+	//
+	//if keyStates[ebiten.KeyA] {
+	//	fmt.Println("La touche 'A' est enfoncée.")
+	//}
+	//
+	//return nil
 }
 
 func (c *CPU) Draw(screen *ebiten.Image) {
