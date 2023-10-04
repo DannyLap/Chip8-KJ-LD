@@ -32,6 +32,7 @@ func (c *CPU) OpcodesReading() {
 			c.ClearScreen()
 			// Clear the display
 		case 0x00EE:
+			fmt.Println("HEY !!!!!!!!!!!!!!!!!!!!!!!")
 			c.PC = uint16(c.Stack[c.SP])
 			c.SP--
 			// Return from a subroutine.The interpreter sets the program counter to the address at the top of the stack,
@@ -41,6 +42,7 @@ func (c *CPU) OpcodesReading() {
 		nnn := opcode & 0x0FFF
 		c.PC = nnn
 	case 0x2000:
+		fmt.Println("ON UTILISE CA TA MERE")
 		nnn := opcode & 0x0FFF
 		c.SP++
 		c.Stack[c.SP] = c.PC
@@ -55,6 +57,7 @@ func (c *CPU) OpcodesReading() {
 	case 0x4000:
 		x := (opcode & 0x0F00) / 256
 		nn := byte(opcode & 0x00FF)
+		fmt.Println("x =", x, "et ", c.Registers[x], "!=", nn, "c'est", c.Registers[x] != nn)
 		if c.Registers[x] != nn {
 			c.PC += 2
 		}
@@ -67,6 +70,7 @@ func (c *CPU) OpcodesReading() {
 	case 0x6000:
 		x := (opcode & 0x0F00) / 256
 		kk := byte(opcode & 0x00FF)
+		fmt.Println("v(", x, ") = ", c.Registers[x], "et kk =", kk)
 		c.Registers[x] = kk
 		// Set Vx = kk. The interpreter puts the value kk into register Vx.
 	case 0x7000:
@@ -106,12 +110,12 @@ func (c *CPU) OpcodesReading() {
 		case 0x8004:
 			x := (opcode & 0x0F00) / 256
 			y := (opcode & 0x00F0) / 16
-			c.Registers[x] += c.Registers[y]
-			if c.Registers[x] > 255 {
+			if c.Registers[x]+c.Registers[y] > 255 {
 				c.Registers[0xF] = 1
 			} else {
 				c.Registers[0xF] = 0
 			}
+			c.Registers[x] += c.Registers[y]
 			//Set Vx = Vx + Vy, set VF = carry. The values of Vx and Vy are added together. If the result is greater
 			// than 8 bits (i.e., ¿ 255,) VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored
 			// in Vx
@@ -121,10 +125,10 @@ func (c *CPU) OpcodesReading() {
 
 			if c.Registers[x] >= c.Registers[y] {
 				c.Registers[0xF] = 1
-				c.Registers[x] -= c.Registers[y]
 			} else {
 				c.Registers[0xF] = 0
 			}
+			c.Registers[x] -= c.Registers[y]
 			// Set Vx = Vx - Vy, set VF = NOT borrow. If Vx ¿ Vy, then VF is set to 1, otherwise 0. Then Vy is
 			// subtracted from Vx, and the results stored in Vx
 		case 0x8006:
@@ -142,15 +146,15 @@ func (c *CPU) OpcodesReading() {
 			y := (opcode & 0x00F0) / 16
 			if c.Registers[y] >= c.Registers[x] {
 				c.Registers[0xF] = 1
-				c.Registers[y] -= c.Registers[x]
 			} else {
 				c.Registers[0xF] = 0
 			}
+			c.Registers[x] = c.Registers[y] - c.Registers[x]
 			// 	Set Vx = Vy - Vx, set VF = NOT borrow. If Vy ¿ Vx, then VF is set to 1, otherwise 0. Then Vx is
 			// subtracted from Vy, and the results stored in Vx.
 		case 0x800E:
 			x := (opcode & 0x0F00) / 256
-			if (c.Registers[x]&0xF0)/16 == 1 {
+			if c.Registers[x]&0x80 == 0x80 {
 				c.Registers[0xF] = 1
 			} else {
 				c.Registers[0xF] = 0
