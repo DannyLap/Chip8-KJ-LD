@@ -22,7 +22,6 @@ import (
 
 func (c *CPU) Update() error {
 	c.OpcodesReading()
-	c.PC += 2
 	return nil
 }
 

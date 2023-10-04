@@ -24,6 +24,7 @@ func (c *CPU) AddOpcodesToCPU() {
 func (c *CPU) OpcodesReading() {
 	opcode := uint16(c.Memory[c.PC])<<8 | uint16(c.Memory[c.PC+1])
 	fmt.Println(c.PC, c.Memory[c.PC], c.Memory[c.PC+1])
+	c.PC += 2
 	switch opcode & 0xF000 {
 	case 0x0000:
 		switch opcode {
@@ -38,7 +39,6 @@ func (c *CPU) OpcodesReading() {
 		}
 	case 0x1000:
 		nnn := opcode & 0x0FFF
-		//fmt.Println(nnn)
 		c.PC = nnn
 	case 0x2000:
 		nnn := opcode & 0x0FFF
@@ -48,14 +48,14 @@ func (c *CPU) OpcodesReading() {
 		//Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
 	case 0x3000:
 		x := (opcode & 0x0F00) / 256
-		kk := byte(opcode & 0x00FF)
-		if c.Registers[x] == kk {
+		nn := byte(opcode & 0x00FF)
+		if c.Registers[x] == nn {
 			c.PC += 2
 		}
 	case 0x4000:
 		x := (opcode & 0x0F00) / 256
-		kk := byte(opcode & 0x00FF)
-		if c.Registers[x] == kk {
+		nn := byte(opcode & 0x00FF)
+		if c.Registers[x] != nn {
 			c.PC += 2
 		}
 	case 0x5000:
@@ -150,7 +150,9 @@ func (c *CPU) OpcodesReading() {
 			// subtracted from Vy, and the results stored in Vx.
 		case 0x800E:
 			x := (opcode & 0x0F00) / 256
-			if c.Registers[x]&0x80 == 0x80 {
+			if (c.Registers[x]&0xF0)/16 == 1 {
+				c.Registers[0xF] = 1
+			} else {
 				c.Registers[0xF] = 0
 			}
 			c.Registers[x] <<= 1
@@ -160,7 +162,7 @@ func (c *CPU) OpcodesReading() {
 	case 0x9000:
 		x := (opcode & 0x0F00) / 256
 		y := (opcode & 0x00F0) / 16
-		if c.Registers[x] == c.Registers[y] {
+		if c.Registers[x] != c.Registers[y] {
 			c.PC += 2
 		}
 		//Skip next instruction if Vx != Vy. The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
