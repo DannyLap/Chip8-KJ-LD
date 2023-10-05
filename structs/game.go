@@ -28,57 +28,93 @@ import (
 func (c *CPU) Update() error {
 	c.OpcodesReading()
 
-	//if ebiten.IsKeyPressed(ebiten.KeyA) {
-	//	keyStates[ebiten.KeyA] = true
-	//	fmt.Println("Yesssss")
-	//} else {
-	//	keyStates[ebiten.KeyA] = false
-	//	fmt.Println("No")
-	//}
-	//
-	//if keyStates[ebiten.KeyA] {
-	//	fmt.Println("La touche 'A' est enfoncée.")
-	//}
-
-	if ebiten.IsKeyPressed(ebiten.Key0) || ebiten.IsKeyPressed(ebiten.KeyNumpad0) {
-		c.Key = ebiten.KeyDigit0.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key1) || ebiten.IsKeyPressed(ebiten.KeyNumpad1) {
-		c.Key = ebiten.KeyDigit1.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key2) || ebiten.IsKeyPressed(ebiten.KeyNumpad2) {
-		c.Key = ebiten.KeyDigit2.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key3) || ebiten.IsKeyPressed(ebiten.KeyNumpad3) {
-		c.Key = ebiten.KeyDigit3.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key4) || ebiten.IsKeyPressed(ebiten.KeyNumpad4) {
-		c.Key = ebiten.KeyDigit4.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key5) || ebiten.IsKeyPressed(ebiten.KeyNumpad5) {
-		c.Key = ebiten.KeyDigit5.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key6) || ebiten.IsKeyPressed(ebiten.KeyNumpad6) {
-		c.Key = ebiten.KeyDigit6.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key7) || ebiten.IsKeyPressed(ebiten.KeyNumpad7) {
-		c.Key = ebiten.KeyDigit7.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key8) || ebiten.IsKeyPressed(ebiten.KeyNumpad8) {
-		c.Key = ebiten.KeyDigit8.String()
-	} else if ebiten.IsKeyPressed(ebiten.Key9) || ebiten.IsKeyPressed(ebiten.KeyNumpad9) {
-		c.Key = ebiten.KeyDigit9.String()
-	} else if ebiten.IsKeyPressed(ebiten.KeyQ) { // petit soucis, ebiten comprends le clavier comme du querty donc le Q vaut A
-		c.Key = ebiten.KeyA.String()
-	} else if ebiten.IsKeyPressed(ebiten.KeyB) {
-		c.Key = ebiten.KeyB.String()
-	} else if ebiten.IsKeyPressed(ebiten.KeyC) {
-		c.Key = ebiten.KeyC.String()
-	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
-		c.Key = ebiten.KeyD.String()
-	} else if ebiten.IsKeyPressed(ebiten.KeyE) {
-		c.Key = ebiten.KeyE.String()
-	} else if ebiten.IsKeyPressed(ebiten.KeyF) {
-		c.Key = ebiten.KeyF.String()
+	if ebiten.IsKeyPressed(ebiten.Key0) {
+		c.KeyMap[0x0] = true
+	} else {
+		c.KeyMap[0x0] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key1) {
+		c.KeyMap[0x1] = true
+	} else {
+		c.KeyMap[0x1] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key2) {
+		c.KeyMap[0x2] = true
+	} else {
+		c.KeyMap[0x2] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key3) {
+		c.KeyMap[0x3] = true
+	} else {
+		c.KeyMap[0x3] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key4) {
+		c.KeyMap[0x4] = true
+	} else {
+		c.KeyMap[0x4] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key5) {
+		c.KeyMap[0x5] = true
+	} else {
+		c.KeyMap[0x5] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key6) {
+		c.KeyMap[0x6] = true
+	} else {
+		c.KeyMap[0x6] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key7) {
+		c.KeyMap[0x7] = true
+	} else {
+		c.KeyMap[0x7] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key8) {
+		c.KeyMap[0x8] = true
+	} else {
+		c.KeyMap[0x8] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.Key9) {
+		c.KeyMap[0x9] = true
+	} else {
+		c.KeyMap[0x9] = false
 	}
 
-	if c.Key != "" {
-		fmt.Println("Value of c.Key = ", c.Key)
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		c.KeyMap[0xA] = true
+	} else {
+		c.KeyMap[0xA] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyB) {
+		c.KeyMap[0xB] = true
+	} else {
+		c.KeyMap[0xB] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyC) {
+		c.KeyMap[0xC] = true
+	} else {
+		c.KeyMap[0xC] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		c.KeyMap[0xD] = true
+	} else {
+		c.KeyMap[0xD] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyE) {
+		c.KeyMap[0xE] = true
+	} else {
+		c.KeyMap[0xE] = false
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyF) {
+		c.KeyMap[0xF] = true
+	} else {
+		c.KeyMap[0xF] = false
 	}
 
-	//c.Key = ""
+	for key, value := range c.KeyMap {
+		if value {
+			fmt.Println("La touche qui a pour valeur : ", key, " est enfoncée")
+		}
+	}
 
 	return nil
 }

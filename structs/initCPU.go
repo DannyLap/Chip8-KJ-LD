@@ -11,8 +11,7 @@ type CPU struct {
 	Stack     [16]uint16
 	Opcodes   []byte
 	Screen    [64][32]byte
-	Key       string
-	KeyMap    map[string]bool
+	KeyMap    map[int16]bool
 }
 
 func (g *CPU) InitCPU(data []byte) {
@@ -105,22 +104,22 @@ func StringToHexa(s string) int16 {
 }
 
 func (g *CPU) InitMapHexa() {
-	g.KeyMap = map[string]bool{
-		"0": false,
-		"1": false,
-		"2": false,
-		"3": false,
-		"4": false,
-		"5": false,
-		"6": false,
-		"7": false,
-		"8": false,
-		"9": false,
-		"A": false,
-		"B": false,
-		"C": false,
-		"D": false,
-		"E": false,
-		"F": false,
+	g.KeyMap = map[int16]bool{
+		0x0: false,
+		0x1: false,
+		0x2: false,
+		0x3: false,
+		0x4: false,
+		0x5: false,
+		0x6: false,
+		0x7: false,
+		0x8: false,
+		0x9: false,
+		0xA: false,
+		0xB: false,
+		0xC: false,
+		0xD: false,
+		0xE: false,
+		0xF: false,
 	}
 }

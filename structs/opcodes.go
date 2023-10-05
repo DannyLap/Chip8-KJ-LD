@@ -262,12 +262,9 @@ func (c *CPU) OpcodesReading() {
 
 			//fmt.Println(c.Key)
 
-			key := StringToHexa(c.Key)
+			fmt.Println("x = ", x)
 
-			//fmt.Println("Key = ", key)
-			//fmt.Println("x = ", x)
-
-			if x == key {
+			if c.KeyMap[x] {
 				c.PC += 2
 				c.Key = ""
 			}
