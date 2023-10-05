@@ -23,7 +23,9 @@ func (c *CPU) AddOpcodesToCPU() {
 
 func (c *CPU) OpcodesReading() {
 	opcode := uint16(c.Memory[c.PC])<<8 | uint16(c.Memory[c.PC+1])
-	//fmt.Println(c.PC, c.Memory[c.PC], c.Memory[c.PC+1])
+	fmt.Print(c.PC)
+	fmt.Printf(": 0x%X %X\n", c.Memory[c.PC], c.Memory[c.PC+1])
+	fmt.Println(c.PC, c.Memory[c.PC], c.Memory[c.PC+1])
 	c.PC += 2
 	switch opcode & 0xF000 {
 	case 0x0000:
@@ -51,19 +53,21 @@ func (c *CPU) OpcodesReading() {
 	case 0x3000:
 		x := (opcode & 0x0F00) / 256
 		nn := byte(opcode & 0x00FF)
+		fmt.Println("V(", x, ") = ", c.Registers[x], ", nn =", nn, "ils sont diff ", c.Registers[x] != nn)
 		if c.Registers[x] == nn {
 			c.PC += 2
 		}
 	case 0x4000:
 		x := (opcode & 0x0F00) / 256
 		nn := byte(opcode & 0x00FF)
-		fmt.Println("x =", x, "et ", c.Registers[x], "!=", nn, "c'est", c.Registers[x] != nn)
+		fmt.Println("V(", x, ") = ", c.Registers[x], "nn =", nn, "ils sont égaux ", c.Registers[x] == nn)
 		if c.Registers[x] != nn {
 			c.PC += 2
 		}
 	case 0x5000:
 		x := (opcode & 0x0F00) / 256
 		y := (opcode & 0x00F0) / 16
+		fmt.Println("V(", x, ") = ", c.Registers[x], "et V(", y, ") =", c.Registers[y], "ils sont égaux ", c.Registers[x] == c.Registers[y])
 		if c.Registers[x] == c.Registers[y] {
 			c.PC += 2
 		}
@@ -77,6 +81,7 @@ func (c *CPU) OpcodesReading() {
 		x := (opcode & 0x0F00) / 256
 		kk := byte(opcode & 0x00FF)
 		c.Registers[x] += kk
+		fmt.Println("v(", x, ") = ", c.Registers[x])
 		//Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in Vx.
 	case 0x8000:
 		switch opcode & 0xF00F {
@@ -84,18 +89,23 @@ func (c *CPU) OpcodesReading() {
 			x := (opcode & 0x0F00) / 256
 			y := (opcode & 0x00F0) / 16
 			c.Registers[x] = c.Registers[y]
+			fmt.Println("v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			//Set Vx = Vy. Stores the value of register Vy in register Vx
 		case 0x8001:
 			x := (opcode & 0x0F00) / 256
 			y := (opcode & 0x00F0) / 16
+			fmt.Println("avant v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			c.Registers[x] = c.Registers[x] | c.Registers[y]
+			fmt.Println(" donc v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			//Set Vx = Vx OR Vy. Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A
 			// bitwise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the
 			// result is also 1. Otherwise, it is 0.
 		case 0x8002:
 			x := (opcode & 0x0F00) / 256
 			y := (opcode & 0x00F0) / 16
+			fmt.Println("avant v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			c.Registers[x] = c.Registers[x] & c.Registers[y]
+			fmt.Println("donc v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			// Set Vx = Vx AND Vy. Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx.
 			// A bitwise AND compares the corresponding bits from two values, and if both bits are 1, then the same bit
 			// in the result is also 1. Otherwise, it is 0.
@@ -103,69 +113,87 @@ func (c *CPU) OpcodesReading() {
 		case 0x8003:
 			x := (opcode & 0x0F00) / 256
 			y := (opcode & 0x00F0) / 16
+			fmt.Println("avant v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			c.Registers[x] = c.Registers[x] ^ c.Registers[y]
+			fmt.Println("donc v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			// Set Vx = Vx XOR Vy. Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result
 			// in Vx. An exclusive OR compares the corresponding bits from two values, and if the bits are not both the
 			// same, then the corresponding bit in the result is set to 1. Otherwise, it is 0
 		case 0x8004:
 			x := (opcode & 0x0F00) / 256
 			y := (opcode & 0x00F0) / 16
-			if c.Registers[x]+c.Registers[y] > 255 {
+			fmt.Println("avant v(", x, ") = ", uint16(c.Registers[x]), "v(", y, ") = ", uint16(c.Registers[y]))
+			fmt.Println("v(", x, ") + v(", y, ") = ", uint16(c.Registers[x])+uint16(c.Registers[y]))
+			if uint16(c.Registers[x])+uint16(c.Registers[y]) > 255 {
+				c.Registers[x] += c.Registers[y]
 				c.Registers[0xF] = 1
 			} else {
+				c.Registers[x] += c.Registers[y]
 				c.Registers[0xF] = 0
 			}
-			c.Registers[x] += c.Registers[y]
+			fmt.Println("donc v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			//Set Vx = Vx + Vy, set VF = carry. The values of Vx and Vy are added together. If the result is greater
 			// than 8 bits (i.e., ¿ 255,) VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored
 			// in Vx
 		case 0x8005:
 			x := (opcode & 0x0F00) / 256
 			y := (opcode & 0x00F0) / 16
-
+			fmt.Println("avant v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			if c.Registers[x] >= c.Registers[y] {
+				c.Registers[x] -= c.Registers[y]
 				c.Registers[0xF] = 1
 			} else {
+				c.Registers[x] -= c.Registers[y]
 				c.Registers[0xF] = 0
 			}
-			c.Registers[x] -= c.Registers[y]
+			fmt.Println("donc v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			// Set Vx = Vx - Vy, set VF = NOT borrow. If Vx ¿ Vy, then VF is set to 1, otherwise 0. Then Vy is
 			// subtracted from Vx, and the results stored in Vx
 		case 0x8006:
 			x := (opcode & 0x0F00) / 256
+			fmt.Println("avant v(", x, ") = ", c.Registers[x])
 			if c.Registers[x]&1 == 1 {
+				c.Registers[x] >>= 1
 				c.Registers[0xF] = 1
 			} else {
+				c.Registers[x] >>= 1
 				c.Registers[0xF] = 0
 			}
-			c.Registers[x] >>= 1
+			fmt.Println("donc v(", x, ") = ", c.Registers[x])
 			// Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 			// divided by 2
 		case 0x8007:
 			x := (opcode & 0x0F00) / 256
 			y := (opcode & 0x00F0) / 16
+			fmt.Println("avant v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			if c.Registers[y] >= c.Registers[x] {
+				c.Registers[x] = c.Registers[y] - c.Registers[x]
 				c.Registers[0xF] = 1
 			} else {
+				c.Registers[x] = c.Registers[y] - c.Registers[x]
 				c.Registers[0xF] = 0
 			}
-			c.Registers[x] = c.Registers[y] - c.Registers[x]
+			fmt.Println("donc v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y])
 			// 	Set Vx = Vy - Vx, set VF = NOT borrow. If Vy ¿ Vx, then VF is set to 1, otherwise 0. Then Vx is
 			// subtracted from Vy, and the results stored in Vx.
 		case 0x800E:
 			x := (opcode & 0x0F00) / 256
+			fmt.Println("avant v(", x, ") = ", c.Registers[x])
 			if c.Registers[x]&0x80 == 0x80 {
+				c.Registers[x] <<= 1
 				c.Registers[0xF] = 1
 			} else {
+				c.Registers[x] <<= 1
 				c.Registers[0xF] = 0
 			}
-			c.Registers[x] <<= 1
+			fmt.Println("donc v(", x, ") = ", c.Registers[x])
 			// Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is
 			// multiplied by 2.
 		}
 	case 0x9000:
 		x := (opcode & 0x0F00) / 256
 		y := (opcode & 0x00F0) / 16
+		fmt.Println("v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y], "ils sont diff", c.Registers[x] != c.Registers[y])
 		if c.Registers[x] != c.Registers[y] {
 			c.PC += 2
 		}
@@ -173,6 +201,7 @@ func (c *CPU) OpcodesReading() {
 	case 0xA000:
 		nnn := opcode & 0x0FFF
 		c.I = nnn
+		fmt.Println("I = ", c.I)
 		//Set I = nnn. The value of register I is set to nnn.
 	case 0xB000:
 		nnn := opcode & 0x0FFF
@@ -243,8 +272,6 @@ func (c *CPU) OpcodesReading() {
 				c.Key = ""
 			}
 
-			c.Key = ""
-
 		case 0xE0A1:
 			// todo
 			//  Skip next instruction if key with the value of Vx is not pressed. Checks the keyboard,
@@ -258,7 +285,6 @@ func (c *CPU) OpcodesReading() {
 				c.PC += 2
 				c.Key = ""
 			}
-
 		}
 	case 0xF000:
 		switch opcode & 0xF0FF {

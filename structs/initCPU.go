@@ -1,7 +1,5 @@
 package structs
 
-import "strings"
-
 type CPU struct {
 	Registers [16]byte
 	PC        uint16
@@ -13,6 +11,8 @@ type CPU struct {
 	Stack     [16]uint16
 	Opcodes   []byte
 	Screen    [64][32]byte
+	Key       string
+	KeyMap    map[string]bool
 }
 
 func (g *CPU) InitCPU(data []byte) {
@@ -66,41 +66,61 @@ func (g *CPU) AddFontSetToMemory() {
 }
 
 func StringToHexa(s string) int16 {
-	s = strings.ToUpper(s)
-	switch s[0] {
-	case '0':
+	switch s {
+	case "Digit0":
 		return 0x0
-	case '1':
+	case "Digit1":
 		return 0x1
-	case '2':
+	case "Digit2":
 		return 0x2
-	case '3':
+	case "Digit3":
 		return 0x3
-	case '4':
+	case "Digit4":
 		return 0x4
-	case '5':
+	case "Digit5":
 		return 0x5
-	case '6':
+	case "Digit6":
 		return 0x6
-	case '7':
+	case "Digit7":
 		return 0x7
-	case '8':
+	case "Digit8":
 		return 0x8
-	case '9':
+	case "Digit9":
 		return 0x9
-	case 'A':
+	case "A":
 		return 0xA
-	case 'B':
+	case "B":
 		return 0xB
-	case 'C':
+	case "C":
 		return 0xC
-	case 'D':
+	case "D":
 		return 0xD
-	case 'E':
+	case "E":
 		return 0xE
-	case 'F':
+	case "F":
 		return 0xF
 	default:
-		return 999
+		return 0x10
+	}
+}
+
+func (g *CPU) InitMapHexa() {
+	g.KeyMap = map[string]bool{
+		"0": false,
+		"1": false,
+		"2": false,
+		"3": false,
+		"4": false,
+		"5": false,
+		"6": false,
+		"7": false,
+		"8": false,
+		"9": false,
+		"A": false,
+		"B": false,
+		"C": false,
+		"D": false,
+		"E": false,
+		"F": false,
 	}
 }
