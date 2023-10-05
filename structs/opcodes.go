@@ -1,7 +1,6 @@
 package structs
 
 import (
-	"devt.de/krotik/common/termutil/getch"
 	"fmt"
 	"math/rand"
 	"time"
@@ -24,7 +23,7 @@ func (c *CPU) AddOpcodesToCPU() {
 
 func (c *CPU) OpcodesReading() {
 	opcode := uint16(c.Memory[c.PC])<<8 | uint16(c.Memory[c.PC+1])
-	fmt.Println(c.PC, c.Memory[c.PC], c.Memory[c.PC+1])
+	//fmt.Println(c.PC, c.Memory[c.PC], c.Memory[c.PC+1])
 	c.PC += 2
 	switch opcode & 0xF000 {
 	case 0x0000:
@@ -229,32 +228,37 @@ func (c *CPU) OpcodesReading() {
 			// todo
 			//  Skip next instruction if key with the value of Vx is pressed. Checks the keyboard,
 			//  and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
-			var KeyPress *getch.KeyEvent
+
 			x := int16((opcode & 0x0F00) / 256)
-			// je sais pas a quoi ce sert mais ca doit etre utile
-			if err := getch.Start(); err != nil {
-				fmt.Println(err)
-				return
-			}
-			defer getch.Stop()
 
-			KeyPress, _ = getch.Getch()
-			fmt.Println("Key string = ", KeyPress.String())
-			key := StringToHexa(KeyPress.String())
-			fmt.Println("Key = ", key)
-			fmt.Println("x = ", x)
-			switch key {
-			case x:
-				fmt.Println("vaulacvkabrcabmilabcralvaucvacablcua")
+			//fmt.Println(c.Key)
+
+			key := StringToHexa(c.Key)
+
+			//fmt.Println("Key = ", key)
+			//fmt.Println("x = ", x)
+
+			if x == key {
 				c.PC += 2
-
-			default:
-				fmt.Println("11111111111111111111111111111111111111111111111")
-				c.PC += 1
+				c.Key = ""
 			}
+
+			c.Key = ""
+
 		case 0xE0A1:
 			// todo
-			//Skip next instruction if key with the value of Vx is not pressed. Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2
+			//  Skip next instruction if key with the value of Vx is not pressed. Checks the keyboard,
+			//  and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2
+
+			x := int16((opcode & 0x0F00) / 256)
+			key := StringToHexa(c.Key)
+
+			fmt.Println("op 2 deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+			if x != key {
+				c.PC += 2
+				c.Key = ""
+			}
+
 		}
 	case 0xF000:
 		switch opcode & 0xF0FF {
