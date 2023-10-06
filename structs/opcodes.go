@@ -26,6 +26,7 @@ func (c *CPU) OpcodesReading() {
 	fmt.Print(c.PC)
 	fmt.Printf(": 0x%X %X\n", c.Memory[c.PC], c.Memory[c.PC+1])
 	fmt.Println(c.PC, c.Memory[c.PC], c.Memory[c.PC+1])
+	fmt.Println(c.Registers)
 	c.PC += 2
 	switch opcode & 0xF000 {
 	case 0x0000:
@@ -237,9 +238,9 @@ func (c *CPU) OpcodesReading() {
 	case 0x9000:
 		x := (opcode & 0x0F00) / 256
 		y := (opcode & 0x00F0) / 16
-		if x == 9 || y == 9 {
-			fmt.Println("v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y], "ils sont diff", c.Registers[x] != c.Registers[y])
-		}
+		// if x == 9 || y == 9 {
+		// 	fmt.Println("v(", x, ") = ", c.Registers[x], "v(", y, ") = ", c.Registers[y], "ils sont diff", c.Registers[x] != c.Registers[y])
+		// }
 		if c.Registers[x] != c.Registers[y] {
 			c.PC += 2
 		}
@@ -309,11 +310,11 @@ func (c *CPU) OpcodesReading() {
 
 			x := int16((opcode & 0x0F00) / 256)
 
-			fmt.Println("x = ", x)
+			fmt.Println("down x = ", c.Registers[x])
+			fmt.Println(c.KeyState)
 
-			if c.KeyState[x] == 1 {
+			if c.KeyState[c.Registers[x]] == 1 {
 				c.PC += 2
-				//c.Key = ""
 			}
 
 		case 0xE0A1:
@@ -324,8 +325,11 @@ func (c *CPU) OpcodesReading() {
 			x := int16((opcode & 0x0F00) / 256)
 			//key := StringToHexa(c.Key)
 
+			fmt.Println("up x = ", c.Registers[x])
+			fmt.Println(c.KeyState)
+
 			fmt.Println("op 2 deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-			if c.KeyState[x] == 0 {
+			if c.KeyState[c.Registers[x]] == 0 {
 				c.PC += 2
 			}
 		}
@@ -341,6 +345,7 @@ func (c *CPU) OpcodesReading() {
 		case 0xF00A:
 			x := (opcode & 0x0F00) / 256
 			y := byte(0)
+			fmt.Println(c.KeyState)
 
 			for c.KeyState[y] != 1 {
 				if int(y) == len(c.KeyState)-1 {
@@ -399,19 +404,16 @@ func (c *CPU) OpcodesReading() {
 				c.Memory[c.I+k] = c.Registers[k]
 			}
 			c.I += x + 1
-			if x == 9 {
-				fmt.Println("donc v(", x, ") = ", c.Registers[x])
-			}
+
 			//Stores V0 to VX in memory starting at address I. I is then set to I + x + 1
 		case 0xF065:
 			x := (opcode & 0x0F00) / 256
 			for k := uint16(0); k <= x; k++ {
+				fmt.Println("k = ", k, " V(k) = ", c.Registers[k], " I+k = ", c.I+k, " Memory(I+k)=", c.Memory[c.I+k])
 				c.Registers[k] = c.Memory[c.I+k]
 			}
 			c.I += x + 1
-			if x == 9 {
-				fmt.Println("donc v(", x, ") = ", c.Registers[x])
-			}
+
 			//Fills V0 to VX with values from memory starting at address I. I is then set to I + x + 1.
 		}
 	}
