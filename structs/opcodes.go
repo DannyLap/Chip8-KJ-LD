@@ -341,8 +341,18 @@ func (c *CPU) OpcodesReading() {
 		case 0xF00A:
 			// todo A Faire
 
-			//x := (opcode & 0x0F00) / 256
-			//
+			x := (opcode & 0x0F00) / 256
+			y := byte(0)
+
+			for c.KeyState[y] != 1 {
+				if int(y) == len(c.KeyState)-1 {
+					y = 0
+				} else {
+					y++
+				}
+			}
+
+			c.Registers[x] = y
 			//x = c.KeyMap[]
 
 			fmt.Println("CACACACACACACACACACACACACACACACACACACACACACACACACACACACACACACA")
