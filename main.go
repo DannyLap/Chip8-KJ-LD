@@ -12,9 +12,6 @@ func main() {
 	var memory [4096]byte
 	cpu.Memory = memory
 
-	cpu.KeyMap = make(map[int16]bool)
-	cpu.InitMapHexa()
-
 	file := os.Args[1]
 	// Lit le contenu du fichier en mémoire
 	data, err := ioutil.ReadFile(file)
