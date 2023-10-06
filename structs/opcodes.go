@@ -311,7 +311,7 @@ func (c *CPU) OpcodesReading() {
 
 			fmt.Println("x = ", x)
 
-			if c.KeyMap[x] {
+			if c.KeyState[x] == 1 {
 				c.PC += 2
 				//c.Key = ""
 			}
@@ -325,7 +325,7 @@ func (c *CPU) OpcodesReading() {
 			//key := StringToHexa(c.Key)
 
 			fmt.Println("op 2 deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-			if !c.KeyMap[x] {
+			if c.KeyState[x] == 0 {
 				c.PC += 2
 			}
 		}
@@ -339,8 +339,6 @@ func (c *CPU) OpcodesReading() {
 			}
 			//Set Vx = delay timer value. The value of DT is placed into Vx.
 		case 0xF00A:
-			// todo A Faire
-
 			x := (opcode & 0x0F00) / 256
 			y := byte(0)
 
@@ -351,10 +349,7 @@ func (c *CPU) OpcodesReading() {
 					y++
 				}
 			}
-
 			c.Registers[x] = y
-			//x = c.KeyMap[]
-
 			fmt.Println("CACACACACACACACACACACACACACACACACACACACACACACACACACACACACACACA")
 			//Wait for a key press, store the value of the key in Vx. All execution stops until a key is pressed,
 			//then the value of that key is stored in Vx.
