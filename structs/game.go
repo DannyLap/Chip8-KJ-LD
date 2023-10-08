@@ -1,40 +1,17 @@
 package structs
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// type Game struct {
-// 	Registers []byte
-// 	PC        uint16
-// 	I         uint16
-// 	SP        uint16
-// 	DT        uint16
-// 	ST        uint16
-// 	Memory    [4096]byte
-// 	Stack     [16]uint16
-// 	Opcodes   []byte
-// 	Screen    [64][32]int
-// }
-
-//var (
-//	keyStates = make(map[ebiten.Key]bool)
-//)
-
-type Input struct {
-	KeyState        [16]byte
-	WaitingForInput bool
-}
-
 func (c *CPU) Update() error {
 	cyclesPerFrame := 20
 
 	for i := 0; i < cyclesPerFrame; i++ {
-		c.KeyPress()
+		c.KeyPress(false)
 		c.OpcodesReading()
 	}
 
@@ -47,22 +24,12 @@ func (c *CPU) Update() error {
 	c.UpdateDelayTimer()
 	c.UpdateSoundTimer()
 
-	for i := 0; i < len(c.Input.KeyState); i++ {
-		if c.Input.KeyState[i] == 1 {
-			fmt.Println("La touche qui a pour valeur : ", i, " est enfoncée")
-		}
-	}
-
 	return nil
 }
 
 func (c *CPU) Draw(screen *ebiten.Image) {
 	purpleCol := color.RGBA{255, 0, 255, 255}
 	whiteCol := color.RGBA{255, 255, 255, 255}
-	//blackCol := color.RGBA{0, 0, 0, 255}
-	//redCol := color.RGBA{255, 0, 0, 255}
-	//blueCol := color.RGBA{0, 0, 255, 255}
-	//greenCol := color.RGBA{0, 255, 0, 255}
 
 	for i := 0; i < len(c.Screen); i++ {
 		for j := 0; j < len(c.Screen[i]); j++ {
@@ -95,7 +62,7 @@ func OpenWindowEbiten(cpu *CPU) {
 	}
 }
 
-func (c *CPU) KeyPress() {
+func (c *CPU) KeyPress(inOpcode bool) int {
 	keyPress := [16]bool{
 		ebiten.IsKeyPressed(ebiten.Key0) || ebiten.IsKeyPressed(ebiten.KeyNumpad0),
 		ebiten.IsKeyPressed(ebiten.Key1) || ebiten.IsKeyPressed(ebiten.KeyNumpad1),
@@ -115,11 +82,15 @@ func (c *CPU) KeyPress() {
 		ebiten.IsKeyPressed(ebiten.KeyF)}
 	for keyIndex := range keyPress {
 		if keyPress[keyIndex] {
-			c.Input.KeyState[keyIndex] = 1
+			c.KeyState[keyIndex] = 1
+			if inOpcode {
+				return keyIndex
+			}
 		} else {
-			c.Input.KeyState[keyIndex] = 0
+			c.KeyState[keyIndex] = 0
 		}
 	}
+	return 20
 }
 
 func (c *CPU) UpdateDelayTimer() {
@@ -136,9 +107,4 @@ func (c *CPU) UpdateSoundTimer() {
 
 func (c *CPU) SoundEnabled() bool {
 	return c.ST > 0
-}
-
-func (c *CPU) CatchInput(keyIndex byte) {
-	c.Registers[c.waitingForInputRegisterInput] = keyIndex
-	c.WaitingForInput = false
 }

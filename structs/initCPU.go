@@ -14,12 +14,8 @@ type CPU struct {
 	Stack       [16]uint16
 	Opcodes     []byte
 	Screen      [64][32]byte
-	Input       *Input
 
-	waitingForInputRegisterInput byte
-	WaitingForInput              bool
-
-	//KeyMap map[int16]bool
+	KeyState [16]byte
 }
 
 func (c *CPU) InitCPU(data []byte) {
@@ -27,7 +23,6 @@ func (c *CPU) InitCPU(data []byte) {
 	c.InitMemory(data)
 	c.AddOpcodesToCPU()
 	c.AudioPlayer = NewAudioPlayer()
-	c.Input = new(Input)
 }
 
 func (c *CPU) InitMemory(data []byte) {
@@ -73,64 +68,3 @@ func (c *CPU) AddFontSetToMemory() {
 		c.Memory[i] = b
 	}
 }
-
-//func StringToHexa(s string) int16 {
-//	switch s {
-//	case "Digit0":
-//		return 0x0
-//	case "Digit1":
-//		return 0x1
-//	case "Digit2":
-//		return 0x2
-//	case "Digit3":
-//		return 0x3
-//	case "Digit4":
-//		return 0x4
-//	case "Digit5":
-//		return 0x5
-//	case "Digit6":
-//		return 0x6
-//	case "Digit7":
-//		return 0x7
-//	case "Digit8":
-//		return 0x8
-//	case "Digit9":
-//		return 0x9
-//	case "A":
-//		return 0xA
-//	case "B":
-//		return 0xB
-//	case "C":
-//		return 0xC
-//	case "D":
-//		return 0xD
-//	case "E":
-//		return 0xE
-//	case "F":
-//		return 0xF
-//	default:
-//		return 0x10
-//	}
-//}
-
-//func (g *CPU) InitMapHexa() {
-//
-//	g.KeyMap = map[int16]bool{
-//		0x0: false,
-//		0x1: false,
-//		0x2: falPlayer
-//		0x3: false,
-//		0x4: false,
-//		0x5: false,
-//		0x6: false,
-//		0x7: false,
-//		0x8: false,
-//		0x9: false,
-//		0xA: false,
-//		0xB: false,
-//		0xC: false,
-//		0xD: false,
-//		0xE: false,
-//		0xF: false,
-//	}
-//}
