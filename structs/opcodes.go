@@ -1,7 +1,6 @@
 package structs
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -171,7 +170,6 @@ func (c *CPU) OpcodesReading() {
 			// subtracted from Vy, and the results stored in Vx.
 		case 0x800E:
 			x := (opcode & 0x0F00) / 256
-			fmt.Println("avant v(", x, ") = ", c.Registers[x])
 
 			if c.Registers[x]&0x80 == 0x80 {
 				c.Registers[x] <<= 1
@@ -180,7 +178,6 @@ func (c *CPU) OpcodesReading() {
 				c.Registers[x] <<= 1
 				c.Registers[0xF] = 0
 			}
-			fmt.Println("donc v(", x, ") = ", c.Registers[x])
 
 			// Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is
 			// multiplied by 2.
