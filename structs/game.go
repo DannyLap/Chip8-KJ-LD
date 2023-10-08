@@ -3,8 +3,16 @@ package structs
 import (
 	"image/color"
 	"log"
+	"math/rand"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+)
+
+var (
+	myColor []color.RGBA
 )
 
 func (c *CPU) Update() error {
@@ -28,15 +36,15 @@ func (c *CPU) Update() error {
 }
 
 func (c *CPU) Draw(screen *ebiten.Image) {
-	purpleCol := color.RGBA{255, 0, 255, 255}
-	whiteCol := color.RGBA{255, 255, 255, 255}
+	rand.Seed(time.Now().UnixNano())
+	whiteCol := color.RGBA{R: 255, G: 255, B: 255, A: 255}
 
 	for i := 0; i < len(c.Screen); i++ {
 		for j := 0; j < len(c.Screen[i]); j++ {
 			if c.Screen[i][j] == 1 {
 				DrawASquare(i*5, j*5, screen, 5, whiteCol)
 			} else {
-				DrawASquare(i*5, j*5, screen, 5, purpleCol)
+				DrawASquare(i*5, j*5, screen, 5, myColor[rand.Intn(len(myColor))])
 			}
 		}
 	}
@@ -55,6 +63,44 @@ func (c *CPU) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight
 }
 
 func OpenWindowEbiten(cpu *CPU) {
+	blackCol := []color.RGBA{{0, 0, 0, 255}}
+	multicolor := []color.RGBA{
+		{0, 0, 0, 255},
+		{0, 0, 100, 255},
+		{100, 0, 0, 255},
+		{0, 100, 0, 255},
+		{100, 100, 0, 255},
+		{100, 0, 100, 255},
+		{0, 100, 100, 255},
+	}
+	blackColors := []color.RGBA{
+		{0, 0, 0, 255},
+		{8, 8, 8, 255},
+		{16, 16, 16, 255},
+		{24, 24, 24, 255},
+		{32, 32, 32, 255},
+		{40, 40, 40, 255},
+		{48, 48, 48, 255},
+		{56, 56, 56, 255},
+		{64, 64, 64, 255},
+		{72, 72, 72, 255},
+		{80, 80, 80, 255},
+		{88, 88, 88, 255},
+		{96, 96, 96, 255},
+	}
+
+	if len(os.Args) > 2 {
+		if strings.ToLower(string(os.Args[2])) == "black" {
+			myColor = blackColors
+		} else if strings.ToLower(string(os.Args[2])) == "color" {
+			myColor = multicolor
+		} else {
+			myColor = blackCol
+		}
+	} else {
+		myColor = blackCol
+	}
+
 	ebiten.SetWindowSize(1280, 640)
 	ebiten.SetWindowTitle("Chip 8")
 	if err := ebiten.RunGame(cpu); err != nil {

@@ -1,0 +1,31 @@
+Voici le projet Chip-8 que nous avons réalisé :
+Participants : KREUWEN Julie (B2 Info) et LAPLACE Danny (B2 Info)
+
+--------------------------------
+
+Le but du projet était de créer un émulateur ainsi qu'une interface graphique permettant d'interagir avec cet émulateur.
+L'ensemble du projet est réalisé en Golang.
+Pour l'interface, nous avons choisi d'utiliser ebiten pour des raisons d'efficacité et de polyvalence.
+
+--------------------------------
+
+Pour lancer la lecture d'un fichier, il faut entrer la commande suivante dans le terminal :
+go run . "nom du fichier" (ex : go run . .\1-chip8-logo.ch8)
+/!\ Un petit easter egg se cache lors de l'exécution de la commande, si vous le désirez /!\
+
+--------------------------------
+
+Le projet est donc un émulateur dont le but est de lire un fichier appelé ROM et de suivre les instructions stockées à l'intérieur.
+L'émulateur va stocker la ROM dans une partie de sa mémoire, cette mémoire ayant une capacité maximale de 4 Mo (soit 4 096 octets),
+puis il parcourt chaque donnée, appelée opcodes, afin d'exécuter les actions prédéfinies.
+
+Si tous les opcodes sont bien configurés le jeu ou en tout cas le programme stoké dans la ROM pourra se lancer correctement
+
+--------------------------------
+
+Pour ce qui est de la prepartition du travail :
+Danny a fais tout ce qui est ebiten, rendu visuel et Key press
+Julie a fais tout ce qui touche au cpu, a la repartition et segmentation de la mémoire ainsi que la grande majorité des opcodes
+
+Danny a rejoins Julie sur son pc une fois ses taches fini pour reflechir sur comment gerer les opcodes (on s'est mis sur le meme pc car on a souhaiter
+laisser tous les opcodes sur le meme fichier)
