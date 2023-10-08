@@ -14,7 +14,10 @@ type CPU struct {
 	Stack       [16]uint16
 	Opcodes     []byte
 	Screen      [64][32]byte
-	KeyState    [16]byte
+	Input       *Input
+
+	waitingForInputRegisterInput byte
+	WaitingForInput              bool
 
 	//KeyMap map[int16]bool
 }
@@ -24,6 +27,7 @@ func (c *CPU) InitCPU(data []byte) {
 	c.InitMemory(data)
 	c.AddOpcodesToCPU()
 	c.AudioPlayer = NewAudioPlayer()
+	c.Input = new(Input)
 }
 
 func (c *CPU) InitMemory(data []byte) {

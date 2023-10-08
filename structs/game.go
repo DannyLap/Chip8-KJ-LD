@@ -25,6 +25,11 @@ import (
 //	keyStates = make(map[ebiten.Key]bool)
 //)
 
+type Input struct {
+	KeyState        [16]byte
+	WaitingForInput bool
+}
+
 func (c *CPU) Update() error {
 	cyclesPerFrame := 20
 
@@ -42,8 +47,8 @@ func (c *CPU) Update() error {
 	c.UpdateDelayTimer()
 	c.UpdateSoundTimer()
 
-	for i := 0; i < len(c.KeyState); i++ {
-		if c.KeyState[i] == 1 {
+	for i := 0; i < len(c.Input.KeyState); i++ {
+		if c.Input.KeyState[i] == 1 {
 			fmt.Println("La touche qui a pour valeur : ", i, " est enfoncée")
 		}
 	}
@@ -91,86 +96,29 @@ func OpenWindowEbiten(cpu *CPU) {
 }
 
 func (c *CPU) KeyPress() {
-	if ebiten.IsKeyPressed(ebiten.Key0) || ebiten.IsKeyPressed(ebiten.KeyNumpad0) {
-		c.KeyState[0] = 1
-	} else {
-		c.KeyState[0] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key1) || ebiten.IsKeyPressed(ebiten.KeyNumpad1) {
-		c.KeyState[1] = 1
-	} else {
-		c.KeyState[1] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key2) || ebiten.IsKeyPressed(ebiten.KeyNumpad2) {
-		c.KeyState[2] = 1
-	} else {
-		c.KeyState[2] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key3) || ebiten.IsKeyPressed(ebiten.KeyNumpad3) {
-		c.KeyState[3] = 1
-	} else {
-		c.KeyState[3] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key4) || ebiten.IsKeyPressed(ebiten.KeyNumpad4) {
-		c.KeyState[4] = 1
-	} else {
-		c.KeyState[4] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key5) || ebiten.IsKeyPressed(ebiten.KeyNumpad5) {
-		c.KeyState[5] = 1
-	} else {
-		c.KeyState[5] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key6) || ebiten.IsKeyPressed(ebiten.KeyNumpad6) {
-		c.KeyState[6] = 1
-	} else {
-		c.KeyState[6] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key7) || ebiten.IsKeyPressed(ebiten.KeyNumpad7) {
-		c.KeyState[7] = 1
-	} else {
-		c.KeyState[7] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key8) || ebiten.IsKeyPressed(ebiten.KeyNumpad8) {
-		c.KeyState[8] = 1
-	} else {
-		c.KeyState[8] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.Key9) || ebiten.IsKeyPressed(ebiten.KeyNumpad9) {
-		c.KeyState[9] = 1
-	} else {
-		c.KeyState[9] = 0
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyQ) {
-		c.KeyState[0xA] = 1
-	} else {
-		c.KeyState[0xA] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyB) {
-		c.KeyState[0xB] = 1
-	} else {
-		c.KeyState[0xB] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyC) {
-		c.KeyState[0xC] = 1
-	} else {
-		c.KeyState[0xC] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		c.KeyState[0xD] = 1
-	} else {
-		c.KeyState[0xD] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyE) {
-		c.KeyState[0xE] = 1
-	} else {
-		c.KeyState[0xE] = 0
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyF) {
-		c.KeyState[0xF] = 1
-	} else {
-		c.KeyState[0xF] = 0
+	keyPress := [16]bool{
+		ebiten.IsKeyPressed(ebiten.Key0) || ebiten.IsKeyPressed(ebiten.KeyNumpad0),
+		ebiten.IsKeyPressed(ebiten.Key1) || ebiten.IsKeyPressed(ebiten.KeyNumpad1),
+		ebiten.IsKeyPressed(ebiten.Key2) || ebiten.IsKeyPressed(ebiten.KeyNumpad2),
+		ebiten.IsKeyPressed(ebiten.Key3) || ebiten.IsKeyPressed(ebiten.KeyNumpad3),
+		ebiten.IsKeyPressed(ebiten.Key4) || ebiten.IsKeyPressed(ebiten.KeyNumpad4),
+		ebiten.IsKeyPressed(ebiten.Key5) || ebiten.IsKeyPressed(ebiten.KeyNumpad5),
+		ebiten.IsKeyPressed(ebiten.Key6) || ebiten.IsKeyPressed(ebiten.KeyNumpad6),
+		ebiten.IsKeyPressed(ebiten.Key7) || ebiten.IsKeyPressed(ebiten.KeyNumpad7),
+		ebiten.IsKeyPressed(ebiten.Key8) || ebiten.IsKeyPressed(ebiten.KeyNumpad8),
+		ebiten.IsKeyPressed(ebiten.Key9) || ebiten.IsKeyPressed(ebiten.KeyNumpad9),
+		ebiten.IsKeyPressed(ebiten.KeyQ),
+		ebiten.IsKeyPressed(ebiten.KeyB),
+		ebiten.IsKeyPressed(ebiten.KeyC),
+		ebiten.IsKeyPressed(ebiten.KeyD),
+		ebiten.IsKeyPressed(ebiten.KeyE),
+		ebiten.IsKeyPressed(ebiten.KeyF)}
+	for keyIndex := range keyPress {
+		if keyPress[keyIndex] {
+			c.Input.KeyState[keyIndex] = 1
+		} else {
+			c.Input.KeyState[keyIndex] = 0
+		}
 	}
 }
 
@@ -188,4 +136,9 @@ func (c *CPU) UpdateSoundTimer() {
 
 func (c *CPU) SoundEnabled() bool {
 	return c.ST > 0
+}
+
+func (c *CPU) CatchInput(keyIndex byte) {
+	c.Registers[c.waitingForInputRegisterInput] = keyIndex
+	c.WaitingForInput = false
 }
