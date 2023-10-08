@@ -26,8 +26,71 @@ import (
 //)
 
 func (c *CPU) Update() error {
-	c.OpcodesReading()
+	cyclesPerFrame := 20
 
+	for i := 0; i < cyclesPerFrame; i++ {
+		c.KeyPress()
+		c.OpcodesReading()
+	}
+
+	if c.SoundEnabled() {
+		c.AudioPlayer.SetVolume(1)
+	} else {
+		c.AudioPlayer.SetVolume(0)
+	}
+
+	c.UpdateDelayTimer()
+	c.UpdateSoundTimer()
+
+	for i := 0; i < len(c.KeyState); i++ {
+		if c.KeyState[i] == 1 {
+			fmt.Println("La touche qui a pour valeur : ", i, " est enfoncée")
+		}
+	}
+
+	return nil
+}
+
+func (c *CPU) Draw(screen *ebiten.Image) {
+	purpleCol := color.RGBA{255, 0, 255, 255}
+	whiteCol := color.RGBA{255, 255, 255, 255}
+	//blackCol := color.RGBA{0, 0, 0, 255}
+	//redCol := color.RGBA{255, 0, 0, 255}
+	//blueCol := color.RGBA{0, 0, 255, 255}
+	//greenCol := color.RGBA{0, 255, 0, 255}
+
+	for i := 0; i < len(c.Screen); i++ {
+		for j := 0; j < len(c.Screen[i]); j++ {
+			if c.Screen[i][j] == 1 {
+				DrawASquare(i*5, j*5, screen, 5, whiteCol)
+			} else {
+				DrawASquare(i*5, j*5, screen, 5, purpleCol)
+			}
+		}
+	}
+}
+
+func DrawASquare(x int, y int, screen *ebiten.Image, size int, color color.RGBA) {
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
+			screen.Set(x+i, y+j, color)
+		}
+	}
+}
+
+func (c *CPU) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+	return 320, 160
+}
+
+func OpenWindowEbiten(cpu *CPU) {
+	ebiten.SetWindowSize(1280, 640)
+	ebiten.SetWindowTitle("Chip 8")
+	if err := ebiten.RunGame(cpu); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (c *CPU) KeyPress() {
 	if ebiten.IsKeyPressed(ebiten.Key0) || ebiten.IsKeyPressed(ebiten.KeyNumpad0) {
 		c.KeyState[0] = 1
 	} else {
@@ -109,51 +172,20 @@ func (c *CPU) Update() error {
 	} else {
 		c.KeyState[0xF] = 0
 	}
-
-	for i := 0; i < len(c.KeyState); i++ {
-		if c.KeyState[i] == 1 {
-			fmt.Println("La touche qui a pour valeur : ", i, " est enfoncée")
-		}
-	}
-
-	return nil
 }
 
-func (c *CPU) Draw(screen *ebiten.Image) {
-	purpleCol := color.RGBA{255, 0, 255, 255}
-	whiteCol := color.RGBA{255, 255, 255, 255}
-	//blackCol := color.RGBA{0, 0, 0, 255}
-	//redCol := color.RGBA{255, 0, 0, 255}
-	//blueCol := color.RGBA{0, 0, 255, 255}
-	//greenCol := color.RGBA{0, 255, 0, 255}
-
-	for i := 0; i < len(c.Screen); i++ {
-		for j := 0; j < len(c.Screen[i]); j++ {
-			if c.Screen[i][j] == 1 {
-				DrawASquare(i*5, j*5, screen, 5, whiteCol)
-			} else {
-				DrawASquare(i*5, j*5, screen, 5, purpleCol)
-			}
-		}
+func (c *CPU) UpdateDelayTimer() {
+	if c.DT > 0 {
+		c.DT--
 	}
 }
 
-func DrawASquare(x int, y int, screen *ebiten.Image, size int, color color.RGBA) {
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			screen.Set(x+i, y+j, color)
-		}
+func (c *CPU) UpdateSoundTimer() {
+	if c.ST > 0 {
+		c.ST--
 	}
 }
 
-func (c *CPU) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 320, 160
-}
-
-func OpenWindowEbiten(cpu *CPU) {
-	ebiten.SetWindowSize(1280, 640)
-	ebiten.SetWindowTitle("Chip 8")
-	if err := ebiten.RunGame(cpu); err != nil {
-		log.Fatal(err)
-	}
+func (c *CPU) SoundEnabled() bool {
+	return c.ST > 0
 }

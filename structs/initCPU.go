@@ -1,43 +1,47 @@
 package structs
 
+import "github.com/hajimehoshi/ebiten/audio"
+
 type CPU struct {
-	Registers [16]byte
-	PC        uint16
-	I         uint16
-	SP        uint16
-	DT        uint16
-	ST        uint16
-	Memory    [4096]byte
-	Stack     [16]uint16
-	Opcodes   []byte
-	Screen    [64][32]byte
-	KeyState  [16]byte
+	Registers   [16]byte
+	PC          uint16
+	I           uint16
+	SP          uint16
+	DT          uint16
+	ST          uint16
+	AudioPlayer *audio.Player
+	Memory      [4096]byte
+	Stack       [16]uint16
+	Opcodes     []byte
+	Screen      [64][32]byte
+	KeyState    [16]byte
 
 	//KeyMap map[int16]bool
 }
 
-func (g *CPU) InitCPU(data []byte) {
-	g.PC = 0x200
-	g.InitMemory(data)
-	g.AddOpcodesToCPU()
+func (c *CPU) InitCPU(data []byte) {
+	c.PC = 0x200
+	c.InitMemory(data)
+	c.AddOpcodesToCPU()
+	c.AudioPlayer = NewAudioPlayer()
 }
 
-func (g *CPU) InitMemory(data []byte) {
-	g.AddROMToMemory(data)
-	g.AddFontSetToMemory()
+func (c *CPU) InitMemory(data []byte) {
+	c.AddROMToMemory(data)
+	c.AddFontSetToMemory()
 }
 
-func (g *CPU) ClearScreen() {
-	g.Screen = [64][32]byte{}
+func (c *CPU) ClearScreen() {
+	c.Screen = [64][32]byte{}
 }
 
-func (g *CPU) AddROMToMemory(data []byte) {
+func (c *CPU) AddROMToMemory(data []byte) {
 	for i, b := range data {
-		g.Memory[0x200+i] = b
+		c.Memory[0x200+i] = b
 	}
 }
 
-func (g *CPU) AddFontSetToMemory() {
+func (c *CPU) AddFontSetToMemory() {
 	fontset := []byte{
 		0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 		0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -62,7 +66,7 @@ func (g *CPU) AddFontSetToMemory() {
 		0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 		0xF0, 0x80, 0xF0, 0x80, 0x0} // F
 	for i, b := range fontset {
-		g.Memory[i] = b
+		c.Memory[i] = b
 	}
 }
 
@@ -110,7 +114,7 @@ func (g *CPU) AddFontSetToMemory() {
 //	g.KeyMap = map[int16]bool{
 //		0x0: false,
 //		0x1: false,
-//		0x2: false,
+//		0x2: falPlayer
 //		0x3: false,
 //		0x4: false,
 //		0x5: false,

@@ -197,6 +197,8 @@ func (c *CPU) OpcodesReading() {
 			if x == 9 {
 				fmt.Println("donc v(", x, ") = ", c.Registers[x])
 			}
+
+			// e.cpu.V[x] >>= 1
 			// Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 			// divided by 2
 		case 0x8007:
