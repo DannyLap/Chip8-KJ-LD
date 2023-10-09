@@ -23,9 +23,10 @@ Si tous les opcodes sont bien configurés le jeu ou en tout cas le programme sto
 
 --------------------------------
 
-Pour ce qui est de la prepartition du travail :
+Pour ce qui est de la repartition du travail :
 Danny a fais tout ce qui est ebiten, rendu visuel et Key press
 Julie a fais tout ce qui touche au cpu, a la repartition et segmentation de la mémoire ainsi que la grande majorité des opcodes
 
 Danny a rejoins Julie sur son pc une fois ses taches fini pour reflechir sur comment gerer les opcodes (on s'est mis sur le meme pc car on a souhaiter
 laisser tous les opcodes sur le meme fichier)
+Nous avons gerer la partie debug ensemble sur un seul et meme pc
